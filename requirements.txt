@@ -1,0 +1,13 @@
+fastapi
+sqlalchemy
+passlib
+python-jose
+pydantic
+requests
+llama-cpp-python
+faiss-cpu
+sentence-transformers
+numpy
+pdfplumber
+nltk
+uvicorn
