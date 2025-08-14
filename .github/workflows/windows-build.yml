@@ -27,32 +27,11 @@ jobs:
           pip install pyinstaller
 
       - name: Download LLM Model from Hugging Face
-        # On Windows, we'll download the model directly into the `models` directory.
         run: |
           curl.exe -L "https://huggingface.co/reach-vb/Qwen3-0.6B-Q8_0-GGUF/resolve/main/qwen3-0.6b-q8_0.gguf" -o "models/PhysicsChatBot.gguf"
 
       - name: Build executable with PyInstaller
-        # This command is tailored for Windows with the .exe extension and pathing.
-        run: |
-          pyinstaller FullServer.py --name "PhysicsChatbotServer" --onefile \
-          --hidden-import "uvicorn" \
-          --hidden-import "sqlalchemy.dialects.sqlite" \
-          --hidden-import "jose" \
-          --hidden-import "passlib.hash" \
-          --hidden-import "faiss" \
-          --add-data "chat_utils.py:." \
-          --add-data "chat_llm_service.py:." \
-          --add-data "curriculum_indexer.py:." \
-          --add-data "memory_manager.py:." \
-          --add-data "models/PhysicsChatBot.gguf:models" \
-          --collect-submodules "sentence_transformers" \
-          --collect-submodules "llama_cpp" \
-          --collect-submodules "scipy.sparse" \
-          --collect-submodules "scipy.optimize" \
-          --collect-submodules "scipy._lib.array_api_compat.numpy.fft" \
-          --collect-submodules "sklearn" \
-          --clean \
-          --noconfirm
+        run: pyinstaller FullServer.py --name "PhysicsChatbotServer" --onefile --hidden-import "uvicorn" --hidden-import "sqlalchemy.dialects.sqlite" --hidden-import "jose" --hidden-import "passlib.hash" --hidden-import "faiss" --add-data "chat_utils.py:." --add-data "chat_llm_service.py:." --add-data "curriculum_indexer.py:." --add-data "memory_manager.py:." --add-data "models/PhysicsChatBot.gguf:models" --collect-submodules "sentence_transformers" --collect-submodules "llama_cpp" --collect-submodules "scipy.sparse" --collect-submodules "scipy.optimize" --collect-submodules "scipy._lib.array_api_compat.numpy.fft" --collect-submodules "sklearn" --clean --noconfirm
 
       - name: Upload executable as an artifact
         uses: actions/upload-artifact@v4
