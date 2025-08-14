@@ -1,46 +1,45 @@
-name: Build Python App with PyInstaller
+name: Build and Package with PyInstaller
 
-# This workflow will run manually from the GitHub Actions tab.
 on:
-  workflow_dispatch:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
 
 jobs:
-  build-executable:
+  build:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Create models directory
+        run: mkdir -p models
+
+      - name: Download LLM Model from Hugging Face
+        run: |
+          # The -L flag is important to follow redirects from Hugging Face
+          curl -L "https://huggingface.co/reach-vb/Qwen3-0.6B-Q8_0-GGUF/resolve/main/qwen3-0.6b-q8_0.gguf" -o "models/PhysicsChatBot.gguf"
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.10' # Recommended Python version for PyInstaller compatibility
+          python-version: '3.x'
 
-      - name: Install dependencies from requirements.txt
-        # This step uses pip to install all the libraries your application needs.
-        # It's essential to have a `requirements.txt` file in your repository's root.
+      - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-
-      - name: Install PyInstaller
-        run: pip install pyinstaller
+          pip install pyinstaller
 
       - name: Build executable with PyInstaller
-        # This command creates a single executable file.
-        # --onefile: Bundles all code and dependencies into one single executable.
-        # --add-data: Adds external non-python files (like the LLM model and PDFs).
-        # The syntax is 'source:destination' for Linux/macOS runners.
-        # On Windows, the separator would be a semicolon ';'.
         run: |
-          pyinstaller --onefile \
-            --add-data 'models:models' \
-            --add-data 'pdfs:pdfs' \
-            FullServer.py
+          pyinstaller FullServer.py --name "PhysicsChatbotServer" --onefile --hidden-import "uvicorn" --hidden-import "sqlalchemy.dialects.sqlite" --hidden-import "jose" --hidden-import "passlib.hash" --hidden-import "faiss" --add-data "chat_utils.py:." --add-data "chat_llm_service.py:." --add-data "curriculum_indexer.py:." --add-data "memory_manager.py:." --collect-submodules "sentence_transformers" --collect-submodules "llama_cpp" --collect-all "llama_cpp" --collect-submodules "scipy.sparse" --collect-submodules "scipy.optimize" --collect-submodules "scipy._lib.array_api_compat.numpy.fft" --collect-submodules "sklearn" --clean --noconfirm
 
-      - name: Upload executable artifact
+      - name: Upload executable as an artifact
         uses: actions/upload-artifact@v4
         with:
-          name: python-app-linux
-          path: dist/
+          name: PhysicsChatbotServer-executable
+          path: dist/PhysicsChatbotServer
