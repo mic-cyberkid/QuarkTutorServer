@@ -29,7 +29,6 @@ jobs:
       - name: Download LLM Model from Hugging Face
         # On Windows, we'll download the model directly into the `models` directory.
         run: |
-          mkdir models
           curl.exe -L "https://huggingface.co/reach-vb/Qwen3-0.6B-Q8_0-GGUF/resolve/main/qwen3-0.6b-q8_0.gguf" -o "models/PhysicsChatBot.gguf"
 
       - name: Build executable with PyInstaller
