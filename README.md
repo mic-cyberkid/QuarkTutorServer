@@ -32,8 +32,8 @@ Follow these steps to get the project up and running in your local environment.
 Assuming your project is in a Git repository, clone it and move into the project folder.
 
 ```bash
-git clone <your_repository_url>
-cd <your_project_directory>
+git clone https://github.com/mic-cyberkid/QuarkTutorServer
+cd QuarkTutorServer
 ```
 
 ### Step 2: Set up a Virtual Environment
