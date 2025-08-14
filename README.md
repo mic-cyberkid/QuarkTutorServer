@@ -110,6 +110,6 @@ The API will be available at `http://localhost:8000`.
 | System Type | Build Available | Download Link|
 |--------------|-----------------|--------------|
 | Liux  | Yes | [`Download`](https://github.com/mic-cyberkid/QuarkTutorServer/actions/runs/16960611651/artifacts/3763317849) |
-| Windows | Coming soon | N/A |
+| Windows | Yes | [`Download`](https://github.com/mic-cyberkid/QuarkTutorServer/actions/runs/16962058625/artifacts/3763734675 ) |
 | macOS  | Coming soon | N/A |
 
