@@ -105,3 +105,11 @@ The API will be available at `http://localhost:8000`.
   * **`tech_support_logger.py`**: A custom logger class that provides a standardized way to log messages to files with rotation, which is crucial for debugging and technical support.
 
 -----
+
+# Builds
+| System Type | Build Available | Download Link|
+|--------------|-----------------|--------------|
+| Liux  | Yes | [`Download`](https://github.com/mic-cyberkid/QuarkTutorServer/actions/runs/16960611651/artifacts/3763317849) |
+| Windows | Coming soon | N/A |
+| macOS  | Coming soon | N/A |
+
