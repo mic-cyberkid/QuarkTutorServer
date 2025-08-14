@@ -20,7 +20,6 @@ jobs:
 
       - name: Download LLM Model from Hugging Face
         run: |
-          # The -L flag is important to follow redirects from Hugging Face
           curl -L "https://huggingface.co/reach-vb/Qwen3-0.6B-Q8_0-GGUF/resolve/main/qwen3-0.6b-q8_0.gguf" -o "models/PhysicsChatBot.gguf"
 
       - name: Set up Python
@@ -36,7 +35,30 @@ jobs:
 
       - name: Build executable with PyInstaller
         run: |
-          pyinstaller FullServer.py --name "PhysicsChatbotServer" --onefile --hidden-import "uvicorn" --hidden-import "sqlalchemy.dialects.sqlite" --hidden-import "jose" --hidden-import "passlib.hash" --hidden-import "faiss" --add-data "chat_utils.py:." --add-data "chat_llm_service.py:." --add-data "curriculum_indexer.py:." --add-data "memory_manager.py:." --collect-submodules "sentence_transformers" --collect-submodules "llama_cpp" --collect-all "llama_cpp" --collect-submodules "scipy.sparse" --collect-submodules "scipy.optimize" --collect-submodules "scipy._lib.array_api_compat.numpy.fft" --collect-submodules "sklearn" --clean --noconfirm
+          pyinstaller FullServer.py --name "PhysicsChatbotServer" --onefile \
+          --hidden-import "uvicorn" \
+          --hidden-import "sqlalchemy.dialects.sqlite" \
+          --hidden-import "jose" \
+          --hidden-import "passlib.hash" \
+          --hidden-import "faiss" \
+          --add-data "chat_utils.py:." \
+          --add-data "chat_llm_service.py:." \
+          --add-data "curriculum_indexer.py:." \
+          --add-data "memory_manager.py:." \
+          --collect-submodules "sentence_transformers" \
+          --collect-submodules "llama_cpp" \
+          --collect-all "llama_cpp" \
+          --exclude-module "llama_cpp.server" \
+          --exclude-module "llama_cpp.cpu.blas" \
+          --exclude-module "llama_cpp.cuda" \
+          --exclude-module "llama_cpp.metal" \
+          --exclude-module "llama_cpp.openblas" \
+          --collect-submodules "scipy.sparse" \
+          --collect-submodules "scipy.optimize" \
+          --collect-submodules "scipy._lib.array_api_compat.numpy.fft" \
+          --collect-submodules "sklearn" \
+          --clean \
+          --noconfirm
 
       - name: Upload executable as an artifact
         uses: actions/upload-artifact@v4
