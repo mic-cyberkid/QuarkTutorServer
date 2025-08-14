@@ -1,0 +1,46 @@
+name: Build Python App with PyInstaller
+
+# This workflow will run manually from the GitHub Actions tab.
+on:
+  workflow_dispatch:
+
+jobs:
+  build-executable:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10' # Recommended Python version for PyInstaller compatibility
+
+      - name: Install dependencies from requirements.txt
+        # This step uses pip to install all the libraries your application needs.
+        # It's essential to have a `requirements.txt` file in your repository's root.
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Install PyInstaller
+        run: pip install pyinstaller
+
+      - name: Build executable with PyInstaller
+        # This command creates a single executable file.
+        # --onefile: Bundles all code and dependencies into one single executable.
+        # --add-data: Adds external non-python files (like the LLM model and PDFs).
+        # The syntax is 'source:destination' for Linux/macOS runners.
+        # On Windows, the separator would be a semicolon ';'.
+        run: |
+          pyinstaller --onefile \
+            --add-data 'models:models' \
+            --add-data 'pdfs:pdfs' \
+            FullServer.py
+
+      - name: Upload executable artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: python-app-linux
+          path: dist/
