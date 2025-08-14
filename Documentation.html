@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Physics Chatbot Middleware Documentation</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- 
+        Chosen Palette: Slate
+        Application Structure Plan: A single-page application with a fixed sidebar for navigation. The main content area will display different sections (Overview, Architecture, API Reference, etc.) based on user clicks. This dashboard-like structure is ideal for technical documentation, allowing developers to quickly jump to the information they need. The architecture section will feature an interactive diagram, and the API section will be an interactive explorer, which are more engaging and user-friendly than static text.
+        Visualization & Content Choices: 
+        - Report Info: Architecture section. -> Goal: Organize/Relationships. -> Viz/Method: Interactive diagram using HTML/CSS/JS. -> Interaction: Clicking a module shows a modal with its description. -> Justification: Visualizing the component flow is more intuitive than reading a list.
+        - Report Info: API Endpoints. -> Goal: Inform/Organize. -> Viz/Method: A three-panel API explorer layout. -> Interaction: Selecting categories and endpoints dynamically populates the details view. -> Justification: A standard and highly effective UX pattern for API documentation that prevents information overload.
+        - Report Info: Setup instructions for different OSes. -> Goal: Organize. -> Viz/Method: Tabbed interface. -> Interaction: Clicking tabs switches the visible content. -> Justification: Saves space and separates content cleanly for the user.
+        CONFIRMATION: NO SVG graphics used. NO Mermaid JS used.
+    -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc; /* slate-50 */
+            color: #334155; /* slate-700 */
+        }
+        .sidebar-link {
+            transition: all 0.2s ease-in-out;
+        }
+        .sidebar-link.active {
+            background-color: #475569; /* slate-600 */
+            color: #f1f5f9; /* slate-100 */
+            font-weight: 600;
+        }
+        .sidebar-link:hover:not(.active) {
+            background-color: #e2e8f0; /* slate-200 */
+        }
+        .content-section {
+            display: none;
+        }
+        .content-section.active {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .api-explorer-menu-item.active {
+            background-color: #cbd5e1; /* slate-300 */
+            font-weight: 600;
+        }
+        .tab-button.active {
+            border-color: #475569; /* slate-600 */
+            color: #1e293b; /* slate-800 */
+            font-weight: 600;
+        }
+        .modal-overlay {
+            transition: opacity 0.3s ease;
+        }
+        .modal-content {
+            transition: transform 0.3s ease;
+        }
+        .code-block {
+            background-color: #1e293b; /* slate-800 */
+            color: #e2e8f0; /* slate-200 */
+            border-radius: 0.5rem;
+            padding: 1rem;
+            font-family: 'Courier New', Courier, monospace;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+    </style>
+</head>
+<body class="flex min-h-screen">
+    <!-- Sidebar -->
+    <aside id="sidebar" class="bg-slate-100 text-slate-800 w-64 p-4 space-y-2 fixed top-0 left-0 h-full transition-transform -translate-x-full md:translate-x-0">
+        <h1 class="text-2xl font-bold text-slate-800 pb-4 border-b border-slate-300">Physics Chatbot</h1>
+        <nav>
+            <a href="#overview" class="sidebar-link active block p-2 rounded-lg">Overview</a>
+            <a href="#architecture" class="sidebar-link block p-2 rounded-lg">Architecture</a>
+            <a href="#api-reference" class="sidebar-link block p-2 rounded-lg">API Reference</a>
+            <a href="#setup" class="sidebar-link block p-2 rounded-lg">Setup & Deployment</a>
+            <a href="#troubleshooting" class="sidebar-link block p-2 rounded-lg">Troubleshooting</a>
+        </nav>
+    </aside>
+
+    <!-- Mobile Header -->
+    <header class="md:hidden bg-slate-100 p-4 sticky top-0 z-10 w-full flex items-center justify-between">
+        <h1 class="text-2xl font-bold text-slate-800">Physics Chatbot</h1>
+        <button id="menu-toggle" class="p-2 rounded-lg hover:bg-slate-200">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
+            </svg>
+        </button>
+    </header>
+
+    <!-- Main Content -->
+    <main id="main-content" class="flex-1 p-6 md:p-10 md:ml-64">
+        <!-- Overview Section -->
+        <section id="overview" class="content-section active">
+            <h2 class="text-4xl font-bold text-slate-800 mb-6">Overview</h2>
+            <p class="mb-8 text-lg text-slate-600">This document provides comprehensive technical documentation for the Physics Chatbot Middleware. This Python-based backend service powers the Physics Chatbot desktop application (JavaFX client), providing its core intelligence, conversational memory, and retrieval-augmented generation (RAG) capabilities.</p>
+            
+            <h3 class="text-3xl font-bold text-slate-800 mb-6">Core Features</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="bg-white p-6 rounded-lg shadow-md border border-slate-200">
+                    <h4 class="font-bold text-xl mb-2 text-slate-700">Authentication & Authorization</h4>
+                    <p class="text-slate-600">Secure user registration, login, and JWT-based access control for all endpoints.</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md border border-slate-200">
+                    <h4 class="font-bold text-xl mb-2 text-slate-700">Conversational AI</h4>
+                    <p class="text-slate-600">Integrates a local Llama.cpp-based LLM for natural language understanding and generation.</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md border border-slate-200">
+                    <h4 class="font-bold text-xl mb-2 text-slate-700">Retrieval-Augmented Generation (RAG)</h4>
+                    <p class="text-slate-600">Enhances LLM responses with relevant information retrieved from an indexed physics curriculum.</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md border border-slate-200">
+                    <h4 class="font-bold text-xl mb-2 text-slate-700">Conversational Memory</h4>
+                    <p class="text-slate-600">Manages short-term and long-term (vector-indexed) conversation memory for context-aware responses.</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md border border-slate-200">
+                    <h4 class="font-bold text-xl mb-2 text-slate-700">Streaming Responses</h4>
+                    <p class="text-slate-600">Supports streaming LLM output for a more interactive and responsive user experience.</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md border border-slate-200">
+                    <h4 class="font-bold text-xl mb-2 text-slate-700">Robust Logging</h4>
+                    <p class="text-slate-600">Implements a custom logging system with file rotation for easy troubleshooting and support.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Architecture Section -->
+        <section id="architecture" class="content-section">
+            <h2 class="text-4xl font-bold text-slate-800 mb-6">System Architecture</h2>
+            <p class="mb-8 text-lg text-slate-600">The middleware is structured into several key components that work together to process requests. Click on any component in the diagram below to learn more about its role and responsibilities.</p>
+            <div class="bg-white p-8 rounded-lg shadow-md border border-slate-200">
+                <div class="relative flex flex-col items-center space-y-4">
+                    <!-- Top Level: Client & Server -->
+                    <div class="flex items-center space-x-4">
+                        <div class="arch-box bg-sky-100 text-sky-800">JavaFX Client</div>
+                        <div class="arrow">&rarr;</div>
+                        <div class="arch-box arch-interactive bg-slate-600 text-white" data-component="FullServer">FullServer.py (FastAPI)</div>
+                    </div>
+
+                    <!-- Connectors -->
+                    <div class="absolute top-24 h-16 border-l-2 border-slate-400 border-dashed"></div>
+
+                    <!-- Second Level: Core Services -->
+                    <div class="flex flex-col md:flex-row justify-center items-center md:items-stretch pt-16 gap-8 text-center">
+                        <div class="flex flex-col items-center">
+                            <div class="arch-box arch-interactive bg-indigo-100 text-indigo-800" data-component="ChatLLMService">chat_llm_service.py</div>
+                            <div class="mt-2 text-sm text-slate-500">LLM Integration</div>
+                        </div>
+                        <div class="flex flex-col items-center">
+                            <div class="arch-box arch-interactive bg-emerald-100 text-emerald-800" data-component="CurriculumIndexer">curriculum_indexer.py</div>
+                             <div class="mt-2 text-sm text-slate-500">RAG & Indexing</div>
+                        </div>
+                        <div class="flex flex-col items-center">
+                            <div class="arch-box arch-interactive bg-rose-100 text-rose-800" data-component="MemoryManager">memory_manager.py</div>
+                             <div class="mt-2 text-sm text-slate-500">Conversational Memory</div>
+                        </div>
+                    </div>
+
+                    <!-- Connectors -->
+                     <div class="absolute top-48 w-full">
+                        <div class="h-8 border-l-2 border-slate-400 border-dashed absolute left-1/2"></div>
+                        <div class="w-1/3 border-t-2 border-slate-400 border-dashed absolute left-[16.66%] top-8"></div>
+                        <div class="w-1/3 border-t-2 border-slate-400 border-dashed absolute left-[50%] top-8"></div>
+                    </div>
+
+                    <!-- Third Level: Persistence -->
+                     <div class="flex flex-col md:flex-row justify-center items-center md:items-stretch pt-16 gap-8 text-center">
+                        <div class="flex flex-col items-center">
+                            <div class="arch-box bg-amber-100 text-amber-800">GGUF Model</div>
+                        </div>
+                        <div class="flex flex-col items-center">
+                            <div class="arch-box bg-amber-100 text-amber-800">FAISS Index & PDFs</div>
+                        </div>
+                        <div class="flex flex-col items-center">
+                            <div class="arch-box bg-amber-100 text-amber-800">SQLite DB & Memory Files</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- API Reference Section -->
+        <section id="api-reference" class="content-section">
+             <h2 class="text-4xl font-bold text-slate-800 mb-6">API Reference</h2>
+             <div class="flex flex-col md:flex-row gap-6">
+                <!-- Left Menu -->
+                <div class="w-full md:w-1/4">
+                    <div id="api-category-menu" class="bg-white p-4 rounded-lg shadow-md border border-slate-200 space-y-2">
+                        <!-- Categories will be populated by JS -->
+                    </div>
+                </div>
+                <!-- Middle Menu -->
+                <div class="w-full md:w-1/4">
+                     <div id="api-endpoint-menu" class="bg-white p-4 rounded-lg shadow-md border border-slate-200 space-y-2">
+                        <p class="text-slate-500">Select a category to see endpoints.</p>
+                     </div>
+                </div>
+                <!-- Right Content -->
+                <div class="w-full md:w-1/2">
+                    <div id="api-endpoint-details" class="bg-white p-6 rounded-lg shadow-md border border-slate-200 min-h-[50vh]">
+                         <p class="text-slate-500 text-center mt-10">Select an endpoint to view its details.</p>
+                    </div>
+                </div>
+             </div>
+        </section>
+
+        <!-- Setup & Deployment Section -->
+        <section id="setup" class="content-section">
+             <h2 class="text-4xl font-bold text-slate-800 mb-6">Setup & Deployment</h2>
+             <div class="bg-white p-6 rounded-lg shadow-md border border-slate-200">
+                <div id="setup-tabs" class="border-b border-slate-300 mb-6">
+                    <button class="tab-button active p-4 border-b-2 border-transparent" data-target="dev-setup">For Developers</button>
+                    <button class="tab-button p-4 border-b-2 border-transparent" data-target="deployment">Deployment</button>
+                </div>
+                <div id="setup-content">
+                    <div id="dev-setup" class="tab-content active space-y-4">
+                        <h3 class="text-2xl font-semibold">Developer Setup Guide</h3>
+                        <p>Follow these steps to run the middleware server on your local machine for development and testing.</p>
+                        <ol class="list-decimal list-inside space-y-2 text-slate-600">
+                            <li><strong>Prerequisites:</strong> Ensure you have Python 3.8+ and `pip` installed.</li>
+                            <li><strong>Project Structure:</strong> Organize your files as specified in the architecture, placing the LLM model in `/models` and curriculum files in `/pdfs`.</li>
+                            <li><strong>Create Virtual Environment:</strong> Run `python -m venv venv` and activate it (`source venv/bin/activate` or `.\venv\Scripts\activate`).</li>
+                            <li><strong>Install Dependencies:</strong> Run `pip install fastapi uvicorn "python-jose[cryptography]" "passlib[bcrypt]" sqlalchemy "faiss-cpu" "sentence-transformers" "pdfplumber" "nltk" "llama-cpp-python" "pystray" "Pillow"`.</li>
+                            <li><strong>Download NLTK Data:</strong> Run `python -c "import nltk; nltk.download('punkt')"` in your terminal.</li>
+                            <li><strong>Run the Server:</strong> From the project root, run `python FullServer.py`. The server will be available at `http://localhost:8000`.</li>
+                        </ol>
+                    </div>
+                    <div id="deployment" class="tab-content hidden space-y-4">
+                        <h3 class="text-2xl font-semibold">Deployment Overview</h3>
+                        <p>The middleware is designed to be packaged into a standalone executable using **PyInstaller**. This executable should then be configured to run as a background OS service for reliability.</p>
+                        <ul class="list-disc list-inside space-y-2 text-slate-600">
+                            <li><strong>Packaging:</strong> Use the provided PyInstaller commands in the documentation to build the `PhysicsChatbotServer` and `ChatbotMonitor` executables.</li>
+                            <li><strong>Windows:</strong> Use NSSM (Non-Sucking Service Manager) to install `PhysicsChatbotServer.exe` as a Windows Service. Use Task Scheduler to run `ChatbotMonitor.exe` at user login.</li>
+                            <li><strong>macOS:</strong> Use `launchd` to configure `PhysicsChatbotServer` as a Launch Daemon (system-wide service) and `ChatbotMonitor` as a Launch Agent (user login item).</li>
+                             <li><strong>Linux:</strong> Use `systemd` to configure `PhysicsChatbotServer` as a service. Use your desktop environment's autostart settings to run `ChatbotMonitor` at user login.</li>
+                        </ul>
+                         <p class="mt-4 p-4 bg-slate-100 rounded-lg">For detailed, step-by-step instructions, please refer to the complete installation guide provided separately.</p>
+                    </div>
+                </div>
+             </div>
+        </section>
+
+        <!-- Troubleshooting Section -->
+        <section id="troubleshooting" class="content-section">
+             <h2 class="text-4xl font-bold text-slate-800 mb-6">Troubleshooting & Logging</h2>
+             <div class="bg-white p-6 rounded-lg shadow-md border border-slate-200 space-y-6">
+                <div>
+                    <h3 class="text-2xl font-semibold mb-2">Troubleshooting Steps</h3>
+                    <ol class="list-decimal list-inside space-y-2 text-slate-600">
+                        <li><strong>Check Service Status:</strong> Use the `ChatbotMonitor` tray application to see if the backend service is reported as "Running". If not, try "Start Service" from its menu.</li>
+                        <li><strong>Examine Service Logs:</strong> Check the OS-level service logs for startup errors (e.g., `service_stdout.log` on Windows, `/var/log` on macOS/Linux).</li>
+                         <li><strong>Review Application Logs:</strong> Navigate to the `data/logs/` directory in your installation folder. Examine `middleware.log` first, then the more specific logs (`llm_service.log`, etc.) for `ERROR` or `CRITICAL` messages.</li>
+                         <li><strong>Verify File Paths:</strong> Ensure the `models/` and `pdfs/` directories are correctly located relative to the `PhysicsChatbotServer` executable.</li>
+                         <li><strong>Check Firewall:</strong> Ensure your firewall is not blocking incoming connections on port 8000.</li>
+                    </ol>
+                </div>
+                <div>
+                    <h3 class="text-2xl font-semibold mb-2">Logging System</h3>
+                    <p class="text-slate-600">The middleware uses a custom `TechSupportLogger` to create detailed, rotating log files, ideal for debugging. All logs are stored in the `data/logs/` directory.</p>
+                     <ul class="list-disc list-inside space-y-2 text-slate-600 mt-4">
+                        <li>`middleware.log`: General application logs from `FullServer.py`.</li>
+                        <li>`llm_service.log`: Logs specific to LLM interactions.</li>
+                        <li>`curriculum_indexer.log`: Logs related to PDF indexing and RAG.</li>
+                        <li>`memory_manager.log`: Logs for conversation memory operations.</li>
+                     </ul>
+                </div>
+                 <div>
+                    <h3 class="text-2xl font-semibold mb-2">Security Considerations</h3>
+                     <ul class="list-disc list-inside space-y-2 text-slate-600">
+                        <li><strong>SECRET_KEY:</strong> For production, this MUST be replaced with a strong key loaded from an environment variable.</li>
+                        <li><strong>CORS:</strong> For production, `allow_origins` should be restricted to the specific origin of your client application, not `*`.</li>
+                        <li><strong>Password Hashing:</strong> Passwords are securely hashed using `bcrypt`.</li>
+                     </ul>
+                </div>
+             </div>
+        </section>
+    </main>
+
+    <!-- Modal for Architecture Diagram -->
+    <div id="arch-modal" class="modal-overlay fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 opacity-0 pointer-events-none">
+        <div class="modal-content bg-white rounded-lg shadow-xl p-8 max-w-2xl w-full transform scale-95">
+            <h3 id="modal-title" class="text-2xl font-bold mb-4"></h3>
+            <p id="modal-description" class="text-slate-600 mb-6"></p>
+            <button id="modal-close" class="bg-slate-600 text-white px-4 py-2 rounded-lg hover:bg-slate-700">Close</button>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // --- Component Data ---
+            const archComponents = {
+                FullServer: {
+                    title: 'FullServer.py (Main Application)',
+                    description: 'The FastAPI application entry point. It handles all API routing, authentication, and orchestrates interactions between the other modules. It includes a `lifespan` event handler for graceful startup and shutdown.'
+                },
+                ChatLLMService: {
+                    title: 'chat_llm_service.py (LLM Integration)',
+                    description: 'Encapsulates all interaction with the `llama_cpp` library. It is responsible for loading the GGUF-formatted LLM model and generating both single and streaming responses based on formatted prompts.'
+                },
+                CurriculumIndexer: {
+                    title: 'curriculum_indexer.py (RAG & Indexing)',
+                    description: 'Manages the Retrieval-Augmented Generation (RAG) process. It extracts text from curriculum PDFs, embeds them into vectors using SentenceTransformers, and indexes them with FAISS for efficient similarity searching.'
+                },
+                MemoryManager: {
+                    title: 'memory_manager.py (Conversational Memory)',
+                    description: 'Manages short-term and long-term conversational history for each user. It uses FAISS to index long-term memory for relevant context retrieval and features a background thread for persisting memory state to disk.'
+                }
+            };
+            const apiData = {
+                "Authentication": {
+                    "Register User": {
+                        method: "POST",
+                        path: "/llm/register",
+                        description: "Registers a new user with a username and password.",
+                        request: `{\n  "username": "string",\n  "password": "string"\n}`,
+                        response: `{\n  "msg": "User registered successfully"\n}`
+                    },
+                    "Get Access Token": {
+                        method: "POST",
+                        path: "/llm/token",
+                        description: "Authenticates a user and returns a JWT access token.",
+                        request: `{\n  "username": "string",\n  "password": "string"\n}`,
+                        response: `{\n  "access_token": "jwt_token",\n  "token_type": "bearer",\n  "username": "string"\n}`
+                    },
+                    "Update Password": {
+                        method: "POST",
+                        path: "/llm/update-password",
+                        description: "Allows an authenticated user to change their password.",
+                        request: `{\n  "old_password": "string",\n  "new_password": "string"\n}`,
+                        response: `{\n  "msg": "Password updated successfully"\n}`
+                    }
+                },
+                "Chat": {
+                    "Send Chat Message": {
+                        method: "POST",
+                        path: "/llm/chat",
+                        description: "Sends a user message, processes it using LLM and RAG, and streams the response.",
+                        request: `{\n  "conversation_id": "string | null",\n  "message": "string",\n  "new_chat": true\n}`,
+                        response: `StreamingResponse of JSON objects:\n{\n  "response": "token_string"\n}`
+                    }
+                },
+                "Conversation History": {
+                    "List All Conversations": {
+                        method: "GET",
+                        path: "/llm/conversations",
+                        description: "Retrieves a list of all conversations for the authenticated user.",
+                        request: `(No request body)`,
+                        response: `{\n  "messages": [\n    {\n      "conversation_id": "string",\n      "conversation_header": "string",\n      "conversation_desc": "string"\n    }\n  ],\n  "total": "integer"\n}`
+                    },
+                    "Get Specific Conversation": {
+                        method: "GET",
+                        path: "/llm/conversations/{conversation_id}",
+                        description: "Retrieves all messages for a specific conversation.",
+                        request: `(No request body)`,
+                        response: `{\n  "conversation_id": "string",\n  "conversations": {\n    "userMessages": ["string", ...],\n    "botMessages": ["string", ...]\n  }\n}`
+                    },
+                    "Delete Conversation": {
+                        method: "DELETE",
+                        path: "/llm/conversations/{conversation_id}",
+                        description: "Deletes a specific conversation and its memory.",
+                        request: `(No request body)`,
+                        response: `{\n  "status": "deleted",\n  "conversation_id": "string"\n}`
+                    }
+                },
+                "Utilities": {
+                     "Health Check": {
+                        method: "GET",
+                        path: "/",
+                        description: "A simple endpoint to check if the middleware server is running.",
+                        request: `(No request body)`,
+                        response: `{\n  "status": "running"\n}`
+                    },
+                    "Unit Conversion": {
+                        method: "POST",
+                        path: "/llm/conversion",
+                        description: "Provides explanations for unit conversions or general physics concepts.",
+                        request: `{\n  "message": "string"\n}`,
+                        response: `{\n  "response": "string"\n}`
+                    },
+                    "Debug Memory": {
+                        method: "GET",
+                        path: "/llm/debug/memory?conversation_id=...",
+                        description: "Provides debug information about the memory state for a conversation.",
+                        request: `(No request body)`,
+                        response: `{\n  "recent_history_count": "integer",\n  "summary": "string",\n  "long_term_count": "integer",\n  ...\n}`
+                    }
+                }
+            };
+
+            // --- Navigation ---
+            const sidebarLinks = document.querySelectorAll('.sidebar-link');
+            const sections = document.querySelectorAll('.content-section');
+            const sidebar = document.getElementById('sidebar');
+            const menuToggle = document.getElementById('menu-toggle');
+
+            menuToggle.addEventListener('click', () => {
+                sidebar.classList.toggle('-translate-x-full');
+            });
+            
+            function updateActiveLink(targetId) {
+                sidebarLinks.forEach(link => {
+                    link.classList.toggle('active', link.getAttribute('href') === `#${targetId}`);
+                });
+                sections.forEach(section => {
+                    section.classList.toggle('active', section.id === targetId);
+                });
+                 if (window.innerWidth < 768) { // md breakpoint
+                    sidebar.classList.add('-translate-x-full');
+                }
+            }
+            
+            sidebarLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const targetId = this.getAttribute('href').substring(1);
+                    updateActiveLink(targetId);
+                });
+            });
+
+            // Handle initial page load
+            const initialHash = window.location.hash.substring(1) || 'overview';
+            updateActiveLink(initialHash);
+
+
+            // --- Architecture Diagram Modal ---
+            const archModal = document.getElementById('arch-modal');
+            const modalTitle = document.getElementById('modal-title');
+            const modalDescription = document.getElementById('modal-description');
+            const modalClose = document.getElementById('modal-close');
+            
+            document.querySelectorAll('.arch-interactive').forEach(box => {
+                box.style.cursor = 'pointer';
+                box.addEventListener('click', function() {
+                    const componentKey = this.dataset.component;
+                    const component = archComponents[componentKey];
+                    if(component) {
+                        modalTitle.textContent = component.title;
+                        modalDescription.textContent = component.description;
+                        archModal.classList.remove('opacity-0', 'pointer-events-none');
+                        archModal.querySelector('.modal-content').classList.remove('scale-95');
+                    }
+                });
+            });
+
+            function closeModal() {
+                archModal.classList.add('opacity-0', 'pointer-events-none');
+                archModal.querySelector('.modal-content').classList.add('scale-95');
+            }
+
+            modalClose.addEventListener('click', closeModal);
+            archModal.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeModal();
+                }
+            });
+
+
+            // --- API Reference Explorer ---
+            const categoryMenu = document.getElementById('api-category-menu');
+            const endpointMenu = document.getElementById('api-endpoint-menu');
+            const endpointDetails = document.getElementById('api-endpoint-details');
+            
+            // Populate category menu
+            Object.keys(apiData).forEach(category => {
+                const button = document.createElement('button');
+                button.className = 'api-explorer-menu-item block w-full text-left p-2 rounded-lg hover:bg-slate-200';
+                button.textContent = category;
+                button.dataset.category = category;
+                categoryMenu.appendChild(button);
+            });
+            
+            categoryMenu.addEventListener('click', function(e) {
+                if(e.target.tagName === 'BUTTON') {
+                    const category = e.target.dataset.category;
+                    
+                    // Update active category
+                    categoryMenu.querySelectorAll('button').forEach(btn => btn.classList.remove('active'));
+                    e.target.classList.add('active');
+
+                    // Populate endpoint menu
+                    endpointMenu.innerHTML = '';
+                    Object.keys(apiData[category]).forEach(endpointName => {
+                        const button = document.createElement('button');
+                        button.className = 'api-explorer-menu-item block w-full text-left p-2 rounded-lg hover:bg-slate-200';
+                        button.textContent = endpointName;
+                        button.dataset.category = category;
+                        button.dataset.endpoint = endpointName;
+                        endpointMenu.appendChild(button);
+                    });
+                    endpointDetails.innerHTML = '<p class="text-slate-500 text-center mt-10">Select an endpoint to view its details.</p>';
+                }
+            });
+
+            endpointMenu.addEventListener('click', function(e) {
+                if(e.target.tagName === 'BUTTON') {
+                    const category = e.target.dataset.category;
+                    const endpointName = e.target.dataset.endpoint;
+                    const endpointData = apiData[category][endpointName];
+
+                    // Update active endpoint
+                    endpointMenu.querySelectorAll('button').forEach(btn => btn.classList.remove('active'));
+                    e.target.classList.add('active');
+
+                    // Populate details
+                    const methodColor = {
+                        'POST': 'bg-blue-500',
+                        'GET': 'bg-green-500',
+                        'DELETE': 'bg-red-500'
+                    }[endpointData.method];
+
+                    endpointDetails.innerHTML = `
+                        <div class="flex items-center gap-4 mb-4">
+                            <span class="text-white text-sm font-bold px-3 py-1 rounded-md ${methodColor}">${endpointData.method}</span>
+                            <span class="text-lg font-mono text-slate-700">${endpointData.path}</span>
+                        </div>
+                        <p class="text-slate-600 mb-6">${endpointData.description}</p>
+                        
+                        <h4 class="font-semibold text-slate-800 mb-2 mt-6">Request</h4>
+                        <div class="code-block">${endpointData.request}</div>
+                        
+                        <h4 class="font-semibold text-slate-800 mb-2 mt-6">Response</h4>
+                        <div class="code-block">${endpointData.response}</div>
+                    `;
+                }
+            });
+
+            // --- Setup Tabs ---
+            const tabButtons = document.querySelectorAll('.tab-button');
+            const tabContents = document.querySelectorAll('.tab-content');
+
+            tabButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    tabButtons.forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
+
+                    tabContents.forEach(content => {
+                        content.classList.toggle('hidden', content.id !== this.dataset.target);
+                        content.classList.toggle('active', content.id === this.dataset.target);
+                    });
+                });
+            });
+        });
+    </script>
+</body>
+</html>
