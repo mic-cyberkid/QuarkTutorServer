@@ -47,7 +47,7 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 # One day
 # LLM Model Configuration (for bundled PyInstaller app)
 # We for make sure sey 'models/PhysicsChatBot.gguf' exists relative to our executable.
 MODEL_DIR = "models"
-MODEL_FILENAME = "Qwen3-0.6B-Q8_0.gguf" # Qwen3-0.6b GGUF 
+MODEL_FILENAME = "PhysicsChatbot.gguf" # Qwen3-0.6b GGUF 
 MODEL_PATH = os.path.join(MODEL_DIR, MODEL_FILENAME)
 
 # Ensure wanna model directory exists
