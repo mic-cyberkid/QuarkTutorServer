@@ -26,15 +26,31 @@ jobs:
           pip install -r requirements.txt
           pip install pyinstaller
 
+      - name: Create required folders
+        run: |
+          mkdir -p data/logs
+          mkdir -p data/curriculum
+          mkdir -p models
+          mkdir -p pdfs
+
       - name: Download LLM Model from Hugging Face
         run: |
           curl.exe -L "https://huggingface.co/reach-vb/Qwen3-0.6B-Q8_0-GGUF/resolve/main/qwen3-0.6b-q8_0.gguf" -o "models/PhysicsChatBot.gguf"
 
       - name: Build executable with PyInstaller
-        run: pyinstaller FullServer.py --name "PhysicsChatbotServer" --onefile --hidden-import "uvicorn" --hidden-import "sqlalchemy.dialects.sqlite" --hidden-import "jose" --hidden-import "passlib.hash" --hidden-import "faiss" --add-data "chat_utils.py:." --add-data "chat_llm_service.py:." --add-data "curriculum_indexer.py:." --add-data "memory_manager.py:." --add-data "models/PhysicsChatBot.gguf:models" --collect-submodules "sentence_transformers" --collect-submodules "llama_cpp" --collect-submodules "scipy.sparse" --collect-submodules "scipy.optimize" --collect-submodules "scipy._lib.array_api_compat.numpy.fft" --collect-submodules "sklearn" --clean --noconfirm
+        # The --add-data flags for folders are removed.
+        run: pyinstaller FullServer.py --name "PhysicsChatbotServer" --onefile --hidden-import "uvicorn" --hidden-import "sqlalchemy.dialects.sqlite" --hidden-import "jose" --hidden-import "passlib.hash" --hidden-import "faiss" --add-data "chat_utils.py:." --add-data "chat_llm_service.py:." --add-data "curriculum_indexer.py:." --add-data "memory_manager.py:." --collect-submodules "sentence_transformers" --collect-submodules "llama_cpp" --collect-submodules "scipy.sparse" --collect-submodules "scipy.optimize" --collect-submodules "scipy._lib.array_api_compat.numpy.fft" --collect-submodules "sklearn" --clean --noconfirm
 
-      - name: Upload executable as an artifact
+      - name: Create Distribution Archive
+        shell: powershell
+        run: |
+          # The executable is in dist/, so we will move it to the root of the project
+          Move-Item -Path "dist/PhysicsChatbotServer.exe" -Destination "./PhysicsChatbotServer.exe"
+          # Now zip the required files and folders together
+          Compress-Archive -Path "PhysicsChatbotServer.exe", "data", "pdfs", "models" -DestinationPath "PhysicsChatbotServer-Windows.zip"
+
+      - name: Upload zipped distribution as an artifact
         uses: actions/upload-artifact@v4
         with:
-          name: PhysicsChatbotServer-Windows-executable
-          path: dist/PhysicsChatbotServer.exe
+          name: PhysicsChatbotServer-Windows-Distribution
+          path: PhysicsChatbotServer-Windows.zip
