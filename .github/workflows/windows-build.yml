@@ -26,13 +26,6 @@ jobs:
           pip install -r requirements.txt
           pip install pyinstaller
 
-      - name: Create required folders
-        run: |
-          mkdir -p data/logs
-          mkdir -p data/curriculum
-          mkdir -p models
-          mkdir -p pdfs
-
       - name: Download LLM Model from Hugging Face
         run: |
           curl.exe -L "https://huggingface.co/reach-vb/Qwen3-0.6B-Q8_0-GGUF/resolve/main/qwen3-0.6b-q8_0.gguf" -o "models/PhysicsChatBot.gguf"
